@@ -4,8 +4,9 @@
   "description": "��#\u0000 \u0000M\u0000y\u0000-\u0000C\u0000h\u0000a\u0000t\u0000\r\u0000 \u0000",
   "main": "server.js",
   "scripts": {
-    "server": "node Backend/server.js"
+    "server": "nodemon Backend/server.js"
   },
+  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -17,5 +18,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.6.2",
     "socket.io": "^4.7.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
   }
 }
