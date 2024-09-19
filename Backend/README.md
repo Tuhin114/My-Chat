@@ -78,3 +78,32 @@ This function is responsible for fetching all messages between the currently aut
 ---
 
 This method allows users to retrieve all messages from a specific conversation between themselves and another user, including the actual message content, by using the `populate()` method to fully load the related message data.
+
+Here’s an explanation of the `getUsersForSidebar` function, which retrieves users to display on the sidebar, excluding the logged-in user:
+
+---
+
+### `getUsersForSidebar` Function (Controller)
+
+This function is responsible for fetching a list of users that can be displayed on the sidebar in a chat or social media application. The logged-in user is excluded from this list.
+
+#### 1. **Extracting Logged-in User ID**
+
+- The function retrieves the ID of the currently logged-in user from the request (`req.user._id`).
+
+#### 2. **Querying the Database for Other Users**
+
+- The database is queried to find all users except the logged-in user. This is done using the condition `{ _id: { $ne: loggedInUserId } }`, where `$ne` stands for "not equal."
+- The `select("-password")` method is used to exclude the `password` field from the returned user data, enhancing security and ensuring sensitive information is not exposed.
+
+#### 3. **Returning the Filtered Users**
+
+- If successful, the function sends a `200` status code and returns the list of filtered users (`res.status(200).json(filteredUsers)`), which can be displayed on the sidebar.
+
+#### 4. **Error Handling**
+
+- If an error occurs during the operation, it is logged to the console (`console.error`), and a `500` status code with an appropriate error message is returned (`res.status(500).json({ error: "Internal server error" })`).
+
+---
+
+This function efficiently retrieves all users, excluding the current logged-in user, while ensuring sensitive information like passwords is not returned. This allows the UI to populate a sidebar with other users for potential conversations or interactions.
