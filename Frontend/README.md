@@ -388,3 +388,124 @@ function UserProfile() {
 - **Global Authentication State**: The `AuthContextProvider` component provides a global way to manage and share the `authUser` state across different parts of your application.
 - **State Persistence**: The initial `authUser` state is hydrated from `localStorage`, allowing user authentication data to persist between page reloads.
 - **Custom Hook (`useAuthContext`)**: This custom hook simplifies access to the authentication context, making it easy to retrieve or update the user's authentication state from any component.
+
+## useLogout hook
+
+### `useLogout` Hook: Functional Explanation
+
+The `useLogout` hook provides the functionality for logging out a user. It handles the logout process, including interacting with an API, updating the authentication state, and managing the loading state while the request is processed. Here's a detailed breakdown:
+
+#### 1. **State Management (`useState`)1**
+
+- **`loading`**:
+  - A `loading` state is used to track whether the logout process is in progress. It ensures that the UI can respond (e.g., disable buttons or show loading spinners) during the logout process.
+  
+  ```js
+  const [loading, setLoading] = useState(false);
+  ```
+
+#### 2. **Context Access (`useAuthContext`)**
+
+- The hook makes use of the `useAuthContext` to access the `setAuthUser` function, which allows it to clear the authenticated user from the global authentication state upon successful logout.
+  
+  ```js
+  const { setAuthUser } = useAuthContext();
+  ```
+
+#### 3. **Logout Function (`logout`)**
+
+##### a. **Setting the Loading State**
+
+- Before initiating the logout request, `setLoading(true)` is called to indicate that the process has started.
+  
+  ```js
+  setLoading(true);
+  ```
+
+##### b. **API Request: Logging Out**
+
+- The `logout` function makes a POST request to the `/api/auth/logout` endpoint. This request tells the server to log out the current user session.
+
+  ```js
+  const res = await fetch("/api/auth/logout", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  });
+  ```
+
+##### c. **Response Handling1**
+
+- Once the server responds, the result is parsed as JSON. If the server returns an error (indicated by `data.error`), the function throws an error, which is caught in the `catch` block.
+
+  ```js
+  const data = await res.json();
+  if (data.error) {
+    throw new Error(data.error);
+  }
+  ```
+
+##### d. **Clearing Local Storage and Updating Context**
+
+- If the logout request is successful:
+  - The `chat-user` item is removed from `localStorage` to clear any persisted user data on the client side.
+  - The global authentication state is updated by calling `setAuthUser(null)`, effectively logging the user out across the application.
+
+  ```js
+  localStorage.removeItem("chat-user");
+  setAuthUser(null);
+  ```
+
+##### e. **Error Handling**
+
+- If the API request fails or the server returns an error, the `catch` block catches the error, and a toast notification is shown with the error message.
+  
+  ```js
+  catch (error) {
+    toast.error(error.message);
+  }
+  ```
+
+##### f. **Resetting the Loading State**
+
+- Whether the request succeeds or fails, the `finally` block ensures that the `loading` state is reset to `false`, signaling that the logout process is complete.
+
+  ```js
+  finally {
+    setLoading(false);
+  }
+  ```
+
+#### 4. **Return Values1**
+
+The `useLogout` hook returns two values:
+
+- **`loading`**: Boolean that indicates whether the logout process is in progress. This can be used to disable UI elements (like buttons) during the process.
+- **`logout`**: The function that executes the logout process.
+
+```js
+return { loading, logout };
+```
+
+### Usage Example
+
+To use this hook in a component, simply call `useLogout` and invoke the `logout` function when needed. For example:
+
+```js
+import useLogout from './path-to-useLogout';
+
+const LogoutButton = () => {
+  const { loading, logout } = useLogout();
+
+  return (
+    <button onClick={logout} disabled={loading}>
+      {loading ? 'Logging out...' : 'Logout'}
+    </button>
+  );
+};
+```
+
+### Key Takeaways3
+
+- **Loading State**: The hook manages a `loading` state to prevent multiple logout requests and to provide visual feedback to the user during the process.
+- **Context Update**: It clears the global authentication state (`authUser`) and local storage to ensure the user is logged out both on the client and server sides.
+- **Error Handling**: If the server returns an error during logout, it provides user feedback using `react-hot-toast`.
