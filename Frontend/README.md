@@ -759,6 +759,7 @@ const LoginPage = () => {
   );
 };
 ```
+
 ## Get Conversations for sidebar
 
 - `npm install zustand`
@@ -767,19 +768,20 @@ const LoginPage = () => {
 
 Your `useConversation` store setup with Zustand looks great! This store allows you to manage the state of the selected conversation and its messages in a clean and simple way. Here’s a quick breakdown and potential improvements:
 
-### Explanation:
+### Explanation
 
 - **`selectedConversation`:** This state holds the currently selected conversation (probably an object or `null` if no conversation is selected).
 - **`setSelectedConversation`:** A function to update the selected conversation.
 - **`messages`:** This state holds the array of messages for the selected conversation.
 - **`setMessages`:** A function to update the messages array.
 
-### Potential Improvements:
+### Potential Improvements
 
 1. **Add Message Update Functions:**
    You may want to add helper functions for handling common actions like adding a new message to the conversation or clearing messages.
 
    Example:
+
    ```js
    import { create } from "zustand";
 
@@ -803,6 +805,7 @@ Your `useConversation` store setup with Zustand looks great! This store allows y
    If you want to keep the conversation state persistent (e.g., after a page reload), you could integrate Zustand with local storage using a middleware.
 
    Example with persistence:
+
    ```js
    import { create } from "zustand";
    import { persist } from "zustand/middleware";
@@ -835,12 +838,13 @@ This approach makes your Zustand store more feature-complete and robust for mana
 
 Your `useGetConversations` hook looks well-structured! It efficiently fetches conversation data from the API and handles loading and errors. Here are some improvements and suggestions you could consider:
 
-### Improvements:
+### Improvements
 
 1. **Error Handling with Status Codes:**
    Instead of relying only on `data.error`, you can handle HTTP status codes explicitly to ensure better error detection.
 
    Example:
+
    ```js
    const res = await fetch("/api/users");
    if (!res.ok) {
@@ -852,6 +856,7 @@ Your `useGetConversations` hook looks well-structured! It efficiently fetches co
    It's good practice to add an abort controller to avoid memory leaks, especially when a component unmounts while the request is still pending.
 
    Example:
+
    ```js
    useEffect(() => {
      const controller = new AbortController();
@@ -887,6 +892,7 @@ Your `useGetConversations` hook looks well-structured! It efficiently fetches co
    You can add a retry mechanism to re-fetch conversations if it fails, using a counter to limit the retries.
 
    Example:
+
    ```js
    const getConversations = async (retryCount = 3) => {
      setLoading(true);
@@ -909,7 +915,8 @@ Your `useGetConversations` hook looks well-structured! It efficiently fetches co
    };
    ```
 
-### Final Code with Improvements:
+### Final Code with Improvements
+
 ```js
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -956,3 +963,27 @@ export default useGetConversations;
 ```
 
 With these adjustments, your hook is more robust, handling aborts, retries, and HTTP errors more efficiently.
+
+## SelectedConversation
+
+The `MessageContainer` component manages and displays either the selected conversation's messages or a welcome prompt if no conversation is selected. Here's a breakdown of the functional aspects:
+
+### `useEffect` Hook
+
+- **Purpose**: This ensures that when the `MessageContainer` is unmounted (when the user navigates away or closes the chat), the selected conversation is reset by calling `setSelectedConversation(null)`. This helps in clearing the state when no conversation is selected anymore.
+- **Dependency Array**: `setSelectedConversation` is included, so the cleanup function runs when the component unmounts.
+
+### Conditional Rendering
+
+- The component checks if `selectedConversation` exists. If it's not selected (`null`), it renders the `NoChatSelected` component, which prompts the user to select a chat.
+- If a conversation is selected, it renders the conversation details, message history (`Messages`), and an input field (`MessageInput`) for sending new messages.
+
+### `NoChatSelected` Component
+
+- The `NoChatSelected` component gets the authenticated user (`authUser`) from the `AuthContext` and shows a welcome message for the user. It's shown when no conversation is selected, inviting the user to start a chat.
+
+### `Messages` and `MessageInput`
+
+- These components handle displaying the chat history and input for sending messages, respectively, once a conversation is active.
+
+In summary, the functional part of the `MessageContainer` revolves around handling the selected conversation and cleaning up when necessary, while managing state through Zustand and displaying relevant content accordingly.
