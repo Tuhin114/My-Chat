@@ -987,3 +987,34 @@ The `MessageContainer` component manages and displays either the selected conver
 - These components handle displaying the chat history and input for sending messages, respectively, once a conversation is active.
 
 In summary, the functional part of the `MessageContainer` revolves around handling the selected conversation and cleaning up when necessary, while managing state through Zustand and displaying relevant content accordingly.
+
+## useSendMessage hook
+
+The `useSendMessage` hook is responsible for handling the process of sending a message in the chat and updating the conversation state with the newly sent message. Here's how the functional aspects work:
+
+### State Management
+
+- **`loading`**: A state variable that tracks whether the message is being sent. It's set to `true` before the fetch request and to `false` once the request is complete, ensuring the UI can react to this loading state (e.g., by disabling inputs).
+  
+### Zustand Integration
+
+- **`useConversation`**: This hook extracts `messages`, `setMessages`, and `selectedConversation` from the Zustand store. It helps manage the conversation state across components.
+  - `messages`: Holds the current conversation's messages.
+  - `setMessages`: Updates the conversation's message list when a new message is sent.
+  - `selectedConversation`: The currently active conversation, used to send messages to the correct user.
+
+### `sendMessage` Function
+
+- **Purpose**: Sends a message to the server for the currently selected conversation.
+  - **Fetch Request**:
+    - Sends a `POST` request to the backend at `/api/messages/send/{selectedConversation._id}` with the message content.
+    - The message is serialized as JSON and included in the request body.
+  - **Error Handling**: If the response contains an error, it's caught and a toast notification is triggered.
+  - **Success Handling**: Upon successful response, the newly sent message (from the server) is appended to the existing messages array using `setMessages([...messages, data])`, ensuring the UI reflects the update.
+
+### Return Values
+
+- **`sendMessage`**: The main function to send the message.
+- **`loading`**: The state flag that can be used to display loading indicators or disable the message input during the send operation.
+
+This hook simplifies message-sending logic and keeps the conversation state synchronized across the app.
