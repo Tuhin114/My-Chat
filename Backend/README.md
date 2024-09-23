@@ -107,3 +107,52 @@ This function is responsible for fetching a list of users that can be displayed 
 ---
 
 This function efficiently retrieves all users, excluding the current logged-in user, while ensuring sensitive information like passwords is not returned. This allows the UI to populate a sidebar with other users for potential conversations or interactions.
+
+## Socket.io
+
+Here’s an explanation of the socket server setup for real-time communication in your application:
+
+---
+
+### Socket.IO Server Setup
+
+This server facilitates real-time communication between connected clients, using Socket.IO and Express.js. It maintains a map of active users and their respective socket connections, allowing efficient messaging and tracking of online users.
+
+#### 1. **Setting Up Socket.IO Server**
+
+- **Server Initialization**:
+  - An HTTP server is created using Express (`http.createServer(app)`), and Socket.IO is initialized (`new Server(server)`) to handle WebSocket connections.
+  - The `cors` configuration allows connections from `http://localhost:3000`, enabling the frontend (likely React) to interact with the WebSocket server.
+
+#### 2. **Managing Online Users**
+
+- **userSocketMap**:
+  - This is an object used to store the mapping of users' IDs to their respective socket IDs (`{ userId: socketId }`).
+  - This allows the server to track which users are currently connected and retrieve their socket IDs for direct communication.
+
+- **getReceiverSocketId**:
+  - A utility function that takes a `receiverId` and returns the corresponding socket ID from `userSocketMap`. This is useful when sending messages to a specific user by their socket ID.
+
+#### 3. **Handling User Connections**
+
+- **Socket Connection Event**:
+  - When a client connects, the server listens for the `"connection"` event. The connected user's socket ID is logged (`socket.id`).
+  - **User Identification**:
+    - The server reads the `userId` from `socket.handshake.query`. If the userId is valid, it maps the user ID to the socket ID in `userSocketMap`, allowing future identification of this user for message delivery.
+  - **Broadcasting Online Users**:
+    - After a new user connects, the server broadcasts the current list of online users (`Object.keys(userSocketMap)`) using `io.emit("getOnlineUsers")`.
+
+#### 4. **Handling Disconnections**
+
+- **Disconnect Event**:
+  - When a user disconnects, the `"disconnect"` event is triggered, and the server logs the disconnection.
+  - The user's socket ID is removed from `userSocketMap` to ensure they are no longer considered online.
+  - The updated list of online users is emitted again to all connected clients.
+
+#### 5. **Exporting Server and Modules**
+
+- The `app`, `io`, and `server` instances are exported for use in other parts of the project. This setup allows the server to handle HTTP requests and Socket.IO events in parallel.
+
+---
+
+This setup ensures efficient tracking of online users and real-time messaging between clients. When users connect or disconnect, their presence is broadcasted to all clients, making it easy to show a list of online users or send targeted messages.

@@ -1137,3 +1137,57 @@ This component provides a search functionality to find a user within existing co
 ---
 
 This component allows users to search for a conversation by the participant's name and select the conversation when a match is found. It provides validation and user feedback through toast notifications for both short search terms and unsuccessful searches.
+
+## SocketContext
+
+-`npm i socket.io-client`
+
+Here’s an explanation of the `SocketContext` and its provider to help document it:
+
+---
+
+### **Socket Context for Real-Time Communication**
+
+This component uses Socket.IO to manage real-time communication and online user tracking within your chat application. It ensures that the app can detect when users are online and listen to real-time events from the server.
+
+#### 1. **Creating the Context**
+
+- **`SocketContext`**:
+  - This context allows any component in the app to access the WebSocket connection and the list of online users.
+- **`useSocketContext`**:
+  - This hook simplifies access to the `SocketContext`, providing an easy way to get the socket instance and online users.
+
+#### 2. **SocketContextProvider**
+
+- This provider component establishes and manages the WebSocket connection. It ensures that the WebSocket connection is only active when the user is authenticated and tears it down when the user logs out.
+
+#### 3. **WebSocket Connection with Socket.IO**
+
+- **Establishing the Connection**:
+  - When the authenticated user (`authUser`) is available, a WebSocket connection is established to `https://chat-app-yt.onrender.com`.
+  - **Query Parameter**: The `userId` is passed in the connection query to identify the user on the server.
+  - **Setting Socket Instance**: The created `socket` instance is stored in state for further communication and listening to events.
+
+- **Listening for Online Users**:
+  - **`getOnlineUsers` Event**:
+    - The client listens to the `"getOnlineUsers"` event emitted by the server. The event provides the list of currently online users, which is updated in the `onlineUsers` state.
+
+- **Cleaning Up the Socket**:
+  - When the user logs out or the component unmounts, the WebSocket connection is closed, preventing memory leaks or unwanted connections.
+  - If the user is no longer authenticated, the `socket` is reset to `null`, and the WebSocket connection is terminated.
+
+#### 4. **Returning Context Provider**
+
+- The `SocketContext.Provider` makes the socket instance and the `onlineUsers` array available to all child components. This ensures that any component needing to interact with the WebSocket or display the online users can easily access these values.
+
+---
+
+### **Usage:**
+
+- Components needing access to the WebSocket or online users can use `useSocketContext()`. For example, to check online users or emit real-time events, a component can simply call:
+
+   ```js
+   const { socket, onlineUsers } = useSocketContext();
+   ```
+
+This setup efficiently manages WebSocket connections based on the user’s authentication state, ensuring proper real-time communication and user tracking across the app.
