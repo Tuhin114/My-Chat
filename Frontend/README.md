@@ -1095,3 +1095,45 @@ This component renders a list of messages between two users, displays skeleton l
 ---
 
 This component manages message rendering efficiently, providing feedback through skeleton loaders while messages are being fetched, and smoothly scrolls to the latest message when new messages arrive. It also handles real-time updates via `useListenMessages`, ensuring a responsive chat experience.
+
+## Search Input
+
+Here’s an explanation of the `SearchInput` component, which is designed to search for a user in a list of conversations:
+
+---
+
+### `SearchInput` Component
+
+This component provides a search functionality to find a user within existing conversations. It uses state management, input handling, and error feedback for user interaction.
+
+#### 1. **State Management**
+
+- `useState` is used to manage the `search` term, which captures the user's input in the search bar.
+- `useConversation` is a Zustand hook that allows access to `setSelectedConversation`, a function to update the currently selected conversation.
+- `useGetConversations` fetches the list of conversations that the user has participated in, returning `conversations`, which contains all the relevant data to search from.
+
+#### 2. **Handling Search Submission**
+
+- The `handleSubmit` function handles the search form submission.
+- **Validation**:
+  - If the search term is empty, the function does nothing (`return`).
+  - If the search term is shorter than 3 characters, an error toast (`toast.error`) is shown, instructing the user that the search term must be at least 3 characters long.
+- **Search Logic**:
+  - The function searches through the `conversations` array, using `find()` to match any conversation where the participant's `fullName` includes the search term (case-insensitive).
+  - If a match is found, the `setSelectedConversation` function is called with the matched conversation to update the selected conversation in the state, and the search input is cleared (`setSearch("")`).
+  - If no match is found, an error toast is displayed with the message `"No such user found!"`.
+
+#### 3. **Rendering the Input and Button**
+
+- The form contains:
+  - A `text` input field where the user types the search term. The value of the input is bound to `search`, and the `onChange` handler updates the search state on every keystroke.
+  - A submit button, styled as a circular button with a magnifying glass icon (`IoSearchSharp`), which triggers the search process when clicked.
+
+#### 4. **Return Structure**
+
+- The `form` element wraps the input and button, with an `onSubmit` handler attached to trigger the search functionality.
+- Tailwind CSS classes like `input`, `input-bordered`, `rounded-full`, `btn`, and `bg-sky-500` are used to style the form and button, making the input field rounded and giving the button a sky-blue background.
+
+---
+
+This component allows users to search for a conversation by the participant's name and select the conversation when a match is found. It provides validation and user feedback through toast notifications for both short search terms and unsuccessful searches.
