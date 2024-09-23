@@ -1191,3 +1191,62 @@ This component uses Socket.IO to manage real-time communication and online user 
    ```
 
 This setup efficiently manages WebSocket connections based on the user’s authentication state, ensuring proper real-time communication and user tracking across the app.
+
+## useListenMessages hook
+
+The `useListenMessages` hook is used to handle real-time message reception and notification in your chat application. Here's how it works, and how you can document it:
+
+---
+
+### **useListenMessages Hook**
+
+This custom React hook listens for new incoming messages via WebSocket (Socket.IO) and manages their integration into the conversation. It also triggers a notification sound whenever a new message is received.
+
+#### 1. **Dependencies**
+
+- **`useSocketContext`**:
+  - The hook uses the WebSocket connection from the `SocketContext` to listen for real-time events.
+- **`useConversation`**:
+  - This Zustand store manages the state of the current conversation and its messages, which is updated when new messages are received.
+- **`notificationSound`**:
+  - A preloaded sound (`notification.mp3`) that is played when a new message arrives.
+
+#### 2. **Listening for New Messages**
+
+- **Socket Event - `newMessage`**:
+  - The hook listens for the `"newMessage"` event on the `socket`. Whenever this event is emitted by the server (indicating a new message), the message is received in the client.
+  - **Message Handling**:
+    - The new message object (`newMessage`) is marked with a property `shouldShake: true` to enable visual indication that the message is new and has not been read yet.
+
+#### 3. **Playing Notification Sound**
+
+- A sound notification is triggered using the `Audio` API. The sound plays every time a new message is received, ensuring the user is alerted to incoming messages even if they’re not actively viewing the conversation.
+
+#### 4. **Updating Messages in the Conversation**
+
+- **Updating State**:
+  - The hook adds the newly received message to the current conversation by spreading the previous `messages` state and appending the `newMessage` to it.
+  - **State Consistency**: It leverages the `setMessages` function from the conversation store to ensure the state is properly updated.
+
+#### 5. **Cleaning Up Event Listener**
+
+- **Socket Cleanup**:
+  - When the component using this hook unmounts or the WebSocket disconnects, the `socket.off("newMessage")` function is called to remove the listener. This prevents memory leaks and multiple event bindings.
+
+#### 6. **Effect Dependencies**
+
+- The effect is re-triggered if the `socket`, `messages`, or `setMessages` change, ensuring the hook remains in sync with the state and WebSocket connection.
+
+---
+
+### **Usage:**
+
+- This hook can be used in any chat-related component that needs to listen for real-time message updates. It plays a notification sound and appends new messages to the existing conversation.
+
+Example usage in a component:
+
+```js
+useListenMessages(); // Starts listening for new messages
+```
+
+This ensures that users receive real-time notifications and their conversation state is always updated when a new message arrives.
