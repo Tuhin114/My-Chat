@@ -5,10 +5,11 @@ const LogoutButton = () => {
   const { loading, logout } = useLogout();
 
   return (
-    <div className="mt-auto">
+    <div className="">
       {!loading ? (
         <BiLogOut
-          className="w-6 h-6 text-white cursor-pointer"
+          size={24}
+          className="text-[#5a495a] hover:text-white cursor-pointer"
           onClick={logout}
         />
       ) : (

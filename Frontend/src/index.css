@@ -3,7 +3,33 @@
 @tailwind utilities;
 
 body {
-  background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
+  /* background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
+    url("/bg.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center; */
+  /* background-color: #8e44ad; */
+  background: linear-gradient(to bottom right, #ac79bcbf 20%, #ff99ff 100%);
+
+  /* background-image: linear-gradient(
+    to bottom,
+    #d66b00,
+    #da770c,
+    #df8217,
+    #e38e22,
+    #e7992c,
+    #e9a436,
+    #ecae41,
+    #eeb84c,
+    #efc35a,
+    #f1ce68,
+    #f2d977,
+    #f4e486
+  ); */
+}
+
+.sidebar_img {
+  background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)),
     url("/bg.png");
   background-repeat: no-repeat;
   background-size: cover;
