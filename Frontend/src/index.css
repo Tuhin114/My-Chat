@@ -10,22 +10,6 @@ body {
   background-position: center; */
   /* background-color: #8e44ad; */
   background: linear-gradient(to bottom right, #ac79bcbf 20%, #ff99ff 100%);
-
-  /* background-image: linear-gradient(
-    to bottom,
-    #d66b00,
-    #da770c,
-    #df8217,
-    #e38e22,
-    #e7992c,
-    #e9a436,
-    #ecae41,
-    #eeb84c,
-    #efc35a,
-    #f1ce68,
-    #f2d977,
-    #f4e486
-  ); */
 }
 
 .sidebar_img {
@@ -36,22 +20,8 @@ body {
   background-position: center;
 }
 
-/* dark mode looking scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #555;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #121212;
-  border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #242424;
+.custom-scroll::-webkit-scrollbar {
+  width: 2px;
 }
 
 /* SHAKE ANIMATION ON HORIZONTAL DIRECTION */

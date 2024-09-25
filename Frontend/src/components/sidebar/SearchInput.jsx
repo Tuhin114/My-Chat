@@ -28,9 +28,9 @@ const SearchInput = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex justify-center items-center my-6"
+      className="flex justify-center items-center my-4"
     >
-      <div className="flex items-center bg-[#4c3659] text-gray-400 rounded-full px-4 py-2 w-72">
+      <div className="flex items-center bg-[#4c3659] text-gray-400 rounded-md px-2 py-1 w-72">
         <input
           type="text"
           placeholder="Search…"
@@ -38,7 +38,7 @@ const SearchInput = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <button type="submit" className="h-6 w-6 text-gray-400 mr-2">
+        <button type="submit" className="h-6 w-6 text-gray-400">
           <IoSearchSharp className="" />
         </button>
       </div>
