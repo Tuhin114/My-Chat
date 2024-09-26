@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import { useAuthContext } from "./AuthContext";
 import io from "socket.io-client";
+import useFetchLastSeen from "../hooks/useFetchLastSeen"; // Import the custom hook
 
 const SocketContext = createContext();
 
@@ -13,6 +14,8 @@ export const SocketContextProvider = ({ children }) => {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const { authUser } = useAuthContext();
 
+  const { usersLastSeen } = useFetchLastSeen(); // Use the custom hook
+
   useEffect(() => {
     if (authUser) {
       const socket = io("http://localhost:8000", {
@@ -23,7 +26,6 @@ export const SocketContextProvider = ({ children }) => {
 
       setSocket(socket);
 
-      // socket.on() is used to listen to the events. can be used both on client and server side
       socket.on("getOnlineUsers", (users) => {
         setOnlineUsers(users);
       });
@@ -37,8 +39,17 @@ export const SocketContextProvider = ({ children }) => {
     }
   }, [authUser]);
 
+  // Handle loading and error states
+  // if (loading) {
+  //   return <div>Loading last seen...</div>;
+  // }
+
+  // if (error) {
+  //   return <div>Error fetching last seen data: {error}</div>;
+  // }
+
   return (
-    <SocketContext.Provider value={{ socket, onlineUsers }}>
+    <SocketContext.Provider value={{ socket, onlineUsers, usersLastSeen }}>
       {children}
     </SocketContext.Provider>
   );

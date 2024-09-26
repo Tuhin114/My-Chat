@@ -6,6 +6,9 @@ import { TiMessages } from "react-icons/ti";
 import { useAuthContext } from "../../context/AuthContext";
 import { BsFillInfoCircleFill } from "react-icons/bs";
 
+import { useSocketContext } from "../../context/SocketContext"; // Adjust path accordingly
+import { formatLastSeen } from "../../utils/extractTime";
+
 const MessageContainer = () => {
   const { selectedConversation, setSelectedConversation } = useConversation();
 
@@ -13,6 +16,17 @@ const MessageContainer = () => {
     // cleanup function (unmounts)
     return () => setSelectedConversation(null);
   }, [setSelectedConversation]);
+
+  const { usersLastSeen } = useSocketContext();
+
+  const getLastSeenText = (userId) => {
+    const user = usersLastSeen.find((u) => u.userId === userId);
+    if (user) {
+      const lastSeenDate = formatLastSeen(user.lastSeen);
+      return lastSeenDate;
+    }
+    return "Last seen unknown";
+  };
 
   return (
     <div className="md:min-w-[650px] flex flex-col bg-white">
@@ -29,15 +43,17 @@ const MessageContainer = () => {
             </div>
             <div className="px-2">
               <div className="font-bold text-lg mt-2">
-                {" "}
-                {/* Reduced margin-top */}
                 {selectedConversation.fullName}
               </div>
               <div className="flex items-center gap-1 mb-2">
-                {" "}
-                {/* Reduced margin-bottom */}
-                <div className="text-sm">Online</div>
-                <div className="bg-green-500 w-1 h-1 rounded-full mt-1"></div>
+                {getLastSeenText(selectedConversation.userId) === "Online" ? (
+                  <div className="flex items-center">
+                    <div className="">Online</div>
+                    <div className="bg-green-500 w-1 h-1 rounded-full mt-1 ml-1"></div>
+                  </div>
+                ) : (
+                  getLastSeenText(selectedConversation.userId)
+                )}
               </div>
             </div>
 
@@ -52,6 +68,7 @@ const MessageContainer = () => {
     </div>
   );
 };
+
 export default MessageContainer;
 
 const NoChatSelected = () => {

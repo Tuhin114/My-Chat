@@ -14,3 +14,13 @@ export const getUsersForSidebar = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+// Fetch user details including last seen
+export const getUserLastSeen = async (req, res) => {
+  try {
+    const users = await User.find({}, "_id username lastSeen");
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch users" });
+  }
+};
