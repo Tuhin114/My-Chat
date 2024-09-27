@@ -20,6 +20,12 @@ export function formatLastSeen(lastSeenTime) {
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
 
+  // Helper function to check if two dates are on the same calendar day
+  const isSameDay = (d1, d2) =>
+    d1.getDate() === d2.getDate() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getFullYear() === d2.getFullYear();
+
   // Format the time in 24-hour format
   const formatTime = (date) => {
     const hours = date.getHours().toString().padStart(2, "0");
@@ -27,18 +33,37 @@ export function formatLastSeen(lastSeenTime) {
     return `${hours}:${minutes}`;
   };
 
+  // Get the day of the week
+  const daysOfWeek = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  const dayOfWeek = daysOfWeek[lastSeenDate.getDay()];
+
   // Active if the user was last seen within the last 5 minutes
   if (timeDiff <= 5 * 60 * 1000) {
     return "Online";
   } else if (timeDiff <= 60 * 60 * 1000) {
     // Within the last hour
     return `Last active ${minutes} min ago`;
-  } else if (days === 0) {
-    // Same day (today)
+  } else if (isSameDay(now, lastSeenDate)) {
+    // Same calendar day (today)
     return `Last seen today at ${formatTime(lastSeenDate)}`;
-  } else if (days === 1) {
-    // Yesterday
-    return "Last seen yesterday";
+  } else if (
+    now.getDate() - lastSeenDate.getDate() === 1 &&
+    now.getMonth() === lastSeenDate.getMonth() &&
+    now.getFullYear() === lastSeenDate.getFullYear()
+  ) {
+    // Previous day (yesterday)
+    return `Last seen yesterday at ${formatTime(lastSeenDate)}`;
+  } else if (days < 7) {
+    // Within the last 7 days (show day of the week)
+    return `Last seen on ${dayOfWeek} at ${formatTime(lastSeenDate)}`;
   } else {
     // Earlier dates
     return `Last seen on ${lastSeenDate.toLocaleDateString([], {
