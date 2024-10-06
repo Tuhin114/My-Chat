@@ -39,15 +39,6 @@ export const SocketContextProvider = ({ children }) => {
     }
   }, [authUser]);
 
-  // Handle loading and error states
-  // if (loading) {
-  //   return <div>Loading last seen...</div>;
-  // }
-
-  // if (error) {
-  //   return <div>Error fetching last seen data: {error}</div>;
-  // }
-
   return (
     <SocketContext.Provider value={{ socket, onlineUsers, usersLastSeen }}>
       {children}

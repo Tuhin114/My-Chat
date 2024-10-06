@@ -52,4 +52,19 @@ io.on("connection", (socket) => {
   });
 });
 
+// Function to notify the sender when the request is accepted
+export function notifySenderRequestAccepted(senderId, recipientId) {
+  const senderSocketId = getReceiverSocketId(senderId); // Fetch the socket ID of the sender (User 2)
+
+  if (senderSocketId) {
+    // Emit a 'requestAccepted' event to the sender
+    io.to(senderSocketId).emit("requestAccepted", {
+      recipientId,
+      senderId, // Pass recipient's ID so the sender can update their UI
+    });
+  } else {
+    console.log("Sender is not connected or socket ID not found");
+  }
+}
+
 export { app, io, server };

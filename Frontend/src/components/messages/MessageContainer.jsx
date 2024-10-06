@@ -1,68 +1,192 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useConversation from "../../zustand/useConversation";
 import MessageInput from "./MessageInput";
 import Messages from "./Messages";
-import { TiMessages } from "react-icons/ti";
 import { useAuthContext } from "../../context/AuthContext";
-import { BsFillInfoCircleFill } from "react-icons/bs";
-
-import { useSocketContext } from "../../context/SocketContext"; // Adjust path accordingly
-import { formatLastSeen } from "../../utils/extractTime";
+import { useSocketContext } from "../../context/SocketContext";
+import Header from "../../utils/Header";
+import NoChatSelected from "../../utils/NoChatSelected";
+import useFriends from "../../hooks/useFriends";
 
 const MessageContainer = () => {
+  const { socket } = useSocketContext();
   const { selectedConversation, setSelectedConversation } = useConversation();
+  const [receivedRequest, setReceivedRequest] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [sentRequest, setSentRequest] = useState(false);
+  const [isFriend, setIsFriend] = useState(false);
+  const { authUser } = useAuthContext();
+  const { friends, fetchFriends } = useFriends();
 
   useEffect(() => {
-    // cleanup function (unmounts)
+    // Check if the selected conversation is a friend
+    if (selectedConversation) {
+      const isAlreadyFriend = friends.some(
+        (friend) => friend._id === selectedConversation._id
+      );
+      setIsFriend(isAlreadyFriend);
+    }
+  }, [friends, selectedConversation]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("requestAccepted", ({ recipientId, senderId }) => {
+        console.log("Request Accepted:", recipientId, senderId);
+        if (
+          authUser._id === senderId &&
+          selectedConversation._id === recipientId
+        ) {
+          setIsFriend(true);
+        }
+      });
+    }
+
+    return () => {
+      if (socket) {
+        socket.off("requestAccepted");
+      }
+    };
+  }, [socket, authUser, selectedConversation]);
+
+  const fetchReceivedRequests = async () => {
+    try {
+      const response = await fetch("/api/requests/get", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching received requests:", error);
+      return { receivedRequests: [], sentRequests: [] };
+    }
+  };
+
+  useEffect(() => {
+    const checkReceivedRequests = async () => {
+      setLoading(true);
+      const requests = await fetchReceivedRequests();
+
+      const receivedRequests = requests?.receivedRequests || [];
+      const sentRequests = requests?.sentRequests || [];
+
+      const sentRequestExists = sentRequests.some(
+        (request) =>
+          request.sender === authUser._id &&
+          request.recipient === selectedConversation._id
+      );
+
+      const receivedRequestExists = receivedRequests.some(
+        (request) =>
+          request.sender === selectedConversation._id &&
+          request.recipient === authUser._id
+      );
+
+      setSentRequest(sentRequestExists);
+      setReceivedRequest(receivedRequestExists);
+      setLoading(false);
+    };
+
+    if (selectedConversation) {
+      checkReceivedRequests();
+    }
+  }, [authUser._id, selectedConversation]);
+
+  const handleAcceptRequest = async () => {
+    const senderId = selectedConversation._id;
+    const recipientId = authUser._id;
+    try {
+      const response = await fetch("/api/requests/accept", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ senderId, recipientId }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to accept request");
+      }
+
+      const data = await response.json();
+      console.log(data.message);
+
+      setReceivedRequest(false);
+      setIsFriend(true); // Update isFriend after accepting request
+
+      // Emit event to notify the sender that the friend request was accepted
+      socket.emit("requestAccepted", { recipientId, senderId });
+      console.log(socket.emit);
+
+      // Fetch updated friend list
+      await fetchFriends(); // Refresh friend list after accepting request
+      console.log(fetchFriends);
+    } catch (error) {
+      console.error("Error accepting request:", error);
+    }
+  };
+
+  const handleSendRequest = async () => {
+    const senderId = authUser._id;
+    const recipientId = selectedConversation._id;
+    try {
+      const response = await fetch("/api/requests/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ senderId, recipientId }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send request");
+      }
+
+      const data = await response.json();
+      console.log(data.message);
+
+      setSentRequest(true); // Update sent request state
+    } catch (error) {
+      console.error("Error sending request:", error);
+    }
+  };
+
+  useEffect(() => {
     return () => setSelectedConversation(null);
   }, [setSelectedConversation]);
-
-  const { usersLastSeen } = useSocketContext();
-
-  const getLastSeenText = (userId) => {
-    const user = usersLastSeen.find((u) => u.userId === userId);
-    if (user) {
-      const lastSeenDate = formatLastSeen(user.lastSeen);
-      return lastSeenDate;
-    }
-    return "Last seen unknown";
-  };
 
   return (
     <div className="md:min-w-[650px] flex flex-col bg-white">
       {!selectedConversation ? (
-        <NoChatSelected />
+        <NoChatSelected authUser={authUser} />
       ) : (
         <>
           {/* Header */}
-          <div className="border-b-gray-200 border-b-2 h-16 flex items-center justify-between px-4">
-            <div className="avatar p-2 ml-2">
-              <div className="w-12 rounded-full">
-                <img src={selectedConversation.profilePic} alt="user avatar" />
-              </div>
-            </div>
-            <div className="px-2">
-              <div className="font-bold text-lg mt-2">
-                {selectedConversation.fullName}
-              </div>
-              <div className="flex items-center gap-1 mb-2">
-                {getLastSeenText(selectedConversation.userId) === "Online" ? (
-                  <div className="flex items-center">
-                    <div className="">Online</div>
-                    <div className="bg-green-500 w-1 h-1 rounded-full mt-1 ml-1"></div>
-                  </div>
-                ) : (
-                  getLastSeenText(selectedConversation.userId)
-                )}
-              </div>
-            </div>
+          <Header selectedConversation={selectedConversation} />
 
-            <div className="ml-auto px-2">
-              <BsFillInfoCircleFill className="text-violet-900 cursor-pointer" />
+          {loading ? (
+            <div className="flex items-center justify-center h-full">
+              Loading...
             </div>
-          </div>
-          <Messages />
-          <MessageInput />
+          ) : isFriend ? (
+            <>
+              <Messages />
+              <MessageInput />
+            </>
+          ) : receivedRequest ? (
+            <button onClick={handleAcceptRequest}>Accept</button>
+          ) : sentRequest ? (
+            <p>Sent successfully</p>
+          ) : (
+            <button onClick={handleSendRequest}>Send Request</button>
+          )}
         </>
       )}
     </div>
@@ -70,16 +194,3 @@ const MessageContainer = () => {
 };
 
 export default MessageContainer;
-
-const NoChatSelected = () => {
-  const { authUser } = useAuthContext();
-  return (
-    <div className="flex items-center justify-center w-full h-full">
-      <div className="px-4 text-center sm:text-lg md:text-xl text-gray-200 font-semibold flex flex-col items-center gap-2">
-        <p>Welcome 👋 {authUser.fullName} ❄</p>
-        <p>Select a chat to start messaging</p>
-        <TiMessages className="text-3xl md:text-6xl text-center" />
-      </div>
-    </div>
-  );
-};
