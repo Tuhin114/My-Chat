@@ -57,11 +57,39 @@ const MessageContainer = () => {
               <MessageInput />
             </>
           ) : receivedRequest ? (
-            <button onClick={handleAcceptRequest}>Accept</button>
+            <div className="flex flex-col items-center justify-center p-4 ">
+              <p className="text-center text-gray-800 font-semibold">
+                {selectedConversation.fullName} has send you a message request.
+              </p>
+              <p className="text-center text-gray-500 ">
+                Please accept the request to start chatting!
+              </p>
+              <button
+                className="px-6 py-2 bg-violet-500 text-white font-medium rounded-md shadow hover:bg-violet-900 transition duration-300 ease-in-out"
+                onClick={handleAcceptRequest}
+              >
+                Accept
+              </button>
+            </div>
           ) : sentRequest ? (
-            <p>Sent successfully</p>
+            <div className="flex flex-col items-center justify-center p-6 ">
+              <p className="text-center text-violet-300">
+                Please wait for the receiver to accept your message request.
+              </p>
+            </div>
           ) : (
-            <button onClick={handleSendRequest}>Send Request</button>
+            <div className="flex flex-col items-center justify-center p-4 ">
+              <p className="text-center text-gray-800 font-semibold text-lg mb-4">
+                You are not friends yet. Send a message request to start
+                chatting!
+              </p>
+              <button
+                onClick={handleSendRequest}
+                className="px-6 py-2 bg-violet-500 text-white font-medium rounded-md shadow hover:bg-violet-900 transition duration-300 ease-in-out"
+              >
+                Send Request
+              </button>
+            </div>
           )}
         </>
       )}

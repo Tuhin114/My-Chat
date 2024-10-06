@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import toast from "react-hot-toast";
 
 const useRequestStatus = (
   socket,
@@ -106,6 +107,8 @@ const useRequestStatus = (
       setReceivedRequest(false);
       setIsFriend(true);
 
+      toast.success("Request accepted successfully!");
+
       // Notify the sender
       socket.emit("requestAccepted", { recipientId, senderId });
 
@@ -113,6 +116,7 @@ const useRequestStatus = (
       await fetchFriends();
     } catch (error) {
       console.error("Error accepting request:", error);
+      toast.error("Failed to accept request.");
     }
   };
 
@@ -133,8 +137,10 @@ const useRequestStatus = (
       }
 
       setSentRequest(true);
+      toast.success("Message request sent successfully!");
     } catch (error) {
       console.error("Error sending request:", error);
+      toast.error("Failed to send message request.");
     }
   };
 
