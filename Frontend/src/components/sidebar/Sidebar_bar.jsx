@@ -6,11 +6,8 @@ import {
 } from "react-icons/io5";
 import { FaRegUser, FaUser } from "react-icons/fa6";
 import LogoutButton from "./LogoutButton";
-import { useState } from "react";
 
-const SideBar_bar = () => {
-  const [selectedIcon, setSelectedIcon] = useState(null);
-
+const SideBar_bar = ({ selectedIcon, setSelectedIcon }) => {
   const handleSelect = (icon) => {
     setSelectedIcon(icon);
   };

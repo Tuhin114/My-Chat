@@ -33,6 +33,8 @@ const useRequestStatus = (
         ) {
           setIsFriend(true);
         }
+        console.log(senderId, recipientId);
+        console.log("All are ok");
       });
     }
 

@@ -1,17 +1,17 @@
-import useGetNonFriends from "../../hooks/useGetNonFriends";
+import useFriends from "../../hooks/useFriends";
 import { getRandomEmoji } from "../../utils/emojis";
 import Conversation from "./Conversation";
 
-const Conversations = () => {
-  const { loading, nonfriends } = useGetNonFriends();
+const Friends = () => {
+  const { loading, friends } = useFriends();
   return (
     <div className="py-2 flex flex-col overflow-auto ">
-      {nonfriends.map((conversation, idx) => (
+      {friends.map((conversation, idx) => (
         <Conversation
           key={conversation._id}
           conversation={conversation}
           emoji={getRandomEmoji()}
-          lastIdx={idx === nonfriends.length - 1}
+          lastIdx={idx === friends.length - 1}
         />
       ))}
 
@@ -21,4 +21,5 @@ const Conversations = () => {
     </div>
   );
 };
-export default Conversations;
+
+export default Friends;
