@@ -1,13 +1,16 @@
 import { BsFillInfoCircleFill } from "react-icons/bs";
 
-import { useSocketContext } from "../context/SocketContext";
 import { formatLastSeen } from "./extractTime";
+import useFetchLastSeen from "../hooks/useFetchLastSeen";
 const Header = ({ selectedConversation }) => {
-  const { usersLastSeen } = useSocketContext();
+  const { usersLastSeen } = useFetchLastSeen();
+
+  // console.log(usersLastSeen);
   console.log(selectedConversation);
 
   const getLastSeenText = (userId) => {
-    const user = usersLastSeen.find((u) => u.userId === userId);
+    const user = usersLastSeen.find((u) => u._id === userId);
+    console.log(user);
     if (user) {
       return formatLastSeen(user.lastSeen);
     }
@@ -26,13 +29,13 @@ const Header = ({ selectedConversation }) => {
           {selectedConversation.fullName}
         </div>
         <div className="flex items-center gap-1 mb-2">
-          {getLastSeenText(selectedConversation.userId) === "Online" ? (
+          {getLastSeenText(selectedConversation._id) === "Online" ? (
             <div className="flex items-center">
               <div className="">Online</div>
               <div className="bg-green-500 w-1 h-1 rounded-full mt-1 ml-1"></div>
             </div>
           ) : (
-            getLastSeenText(selectedConversation.userId)
+            getLastSeenText(selectedConversation._id)
           )}
         </div>
       </div>

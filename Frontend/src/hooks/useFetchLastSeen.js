@@ -16,6 +16,7 @@ const useFetchLastSeen = () => {
           throw new Error("Failed to fetch last seen users");
         }
         const data = await response.json();
+        // console.log(data);
         setUsersLastSeen(data);
       } catch (err) {
         setError(err.message);
