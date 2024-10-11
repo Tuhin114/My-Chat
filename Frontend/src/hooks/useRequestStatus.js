@@ -23,7 +23,7 @@ const useRequestStatus = (
     }
   }, [friends, selectedConversation]);
 
-  // Listen to socket for "requestAccepted"
+  // Listen to socket for "requestAccepted" and "newRequestReceived"
   useEffect(() => {
     if (socket) {
       socket.on("requestAccepted", ({ recipientId, senderId }) => {
@@ -34,13 +34,23 @@ const useRequestStatus = (
           setIsFriend(true);
         }
         console.log(senderId, recipientId);
-        console.log("All are ok");
+      });
+
+      socket.on("newRequestReceived", ({ senderId, recipientId }) => {
+        if (
+          authUser._id === recipientId &&
+          selectedConversation._id === senderId
+        ) {
+          setReceivedRequest(true);
+          toast.info("You have a new message request!");
+        }
       });
     }
 
     return () => {
       if (socket) {
         socket.off("requestAccepted");
+        socket.off("newRequestReceived");
       }
     };
   }, [socket, authUser, selectedConversation]);

@@ -1,6 +1,9 @@
 import User from "../models/user.model.js";
 import Request from "../models/request.model.js";
-import { notifySenderRequestAccepted } from "../socket/socket.js";
+import {
+  notifyReceivedRequest,
+  notifySenderRequestAccepted,
+} from "../socket/socket.js";
 
 export const sendRequest = async (req, res) => {
   try {
@@ -51,6 +54,9 @@ export const sendRequest = async (req, res) => {
     });
 
     await newRequest.save();
+
+    // Notify the recipient that they have received a new request
+    notifyReceivedRequest(senderId, recipientId);
 
     res.status(201).json({ message: "Connection request sent successfully" });
   } catch (error) {

@@ -67,4 +67,19 @@ export function notifySenderRequestAccepted(senderId, recipientId) {
   }
 }
 
+// Notify the recipient that they have received a new request
+export function notifyReceivedRequest(senderId, recipientId) {
+  const recipientSocketId = getReceiverSocketId(recipientId); // Fetch the socket ID of the recipient
+
+  if (recipientSocketId) {
+    // Emit a 'newRequestReceived' event to the recipient
+    io.to(recipientSocketId).emit("newRequestReceived", {
+      senderId,
+      recipientId, // Pass sender's ID so the recipient can update their UI
+    });
+  } else {
+    console.log("Recipient is not connected or socket ID not found");
+  }
+}
+
 export { app, io, server };
